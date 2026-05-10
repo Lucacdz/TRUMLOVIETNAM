@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Silent Room - The Game | Nguyễn Duy Anh</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            background: #010101;
+            min-height: 100vh;
+            font-family: 'Courier New', 'VT323', monospace;
+            overflow: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(0deg, rgba(0,0,0,0.3) 0px, rgba(0,0,0,0.3) 2px, transparent 2px, transparent 6px);
+            pointer-events: none;
+            z-index: 999;
+            opacity: 0.4;
+        }
+
+        .vignette {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            box-shadow: inset 0 0 120px rgba(0,0,0,0.9);
+            pointer-events: none;
+            z-index: 998;
+        }
+
+        .glitch-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 0, 100, 0.15);
+            mix-blend-mode: screen;
+            pointer-events: none;
+            z-index: 1000;
+            animation: glitchFlicker 0.08s infinite;
+        }
+
+        @keyframes glitchFlicker {
+            0% { opacity: 0; }
+            20% { opacity: 0.4; background: rgba(0, 255, 255, 0.2); transform: translate(1px, -1px);}
+            40% { opacity: 0; }
+            60% { opacity: 0.3; background: rgba(255, 0, 255, 0.2); transform: translate(-1px, 1px);}
+            100% { opacity: 0; }
+        }
+
+        #game-container {
+            width: 100vw;
+            height: 100vh;
+            background: radial-gradient(circle at center, #0a0c12 0%, #020304 100%);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow-y: auto;
+        }
+
+        .cinematic-bg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            filter: contrast(1.2) brightness(0.55) grayscale(0.4);
+            transition: filter 0.3s;
+            z-index: 0;
+        }
+
+        .ui-layer {
+            position: relative;
+            z-index: 10;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px;
+            backdrop-filter: blur(3px);
+        }
+
+        .stats-panel {
+            display: flex;
+            gap: 20px;
+            background: rgba(0,0,0,0.75);
+            padding: 10px 20px;
+            border-radius: 4px;
+            border-left: 4px solid #8b0000;
+            backdrop-filter: blur(8px);
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            font-size: 1rem;
+            color: #bcbcbc;
+            letter-spacing: 1px;
+        }
+
+        .stat span { color: #d46b6b; }
+
+        .clock {
+            font-size: 1.3rem;
+            background: black;
+            padding: 4px 12px;
+            border-radius: 2px;
+            color: #ff4444;
+            text-shadow: 0 0 4px red;
+        }
+
+        .dialogue-box {
+            background: rgba(0, 0, 0, 0.88);
+            border-top: 2px solid #4a2a2a;
+            border-left: 2px solid #2a1a1a;
+            padding: 20px;
+            margin: 20px;
+            max-width: 750px;
+            align-self: center;
+            width: 90%;
+            box-shadow: 0 0 25px rgba(0,0,0,0.9);
+            font-size: 1.2rem;
+            color: #ddd8c6;
+        }
+
+        .typewriter-text {
+            min-height: 100px;
+            line-height: 1.4;
+            white-space: pre-wrap;
+        }
+
+        .choices {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-top: 25px;
+            justify-content: center;
+        }
+
+        .choice-btn {
+            background: #110b0b;
+            border: 1px solid #6a3e3e;
+            color: #ebd5b3;
+            padding: 8px 18px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .choice-btn:hover {
+            background: #2c1a1a;
+            border-color: #aa6f6f;
+            transform: scale(1.02);
+        }
+
+        .scene-title {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 0.75rem;
+            color: #884d4d;
+            letter-spacing: 3px;
+        }
+
+        .menu-btn {
+            background: none;
+            border: 1px solid #441111;
+            color: #886666;
+            padding: 5px 12px;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
+        .menu-btn:hover {
+            background: #2a0a0a;
+            color: #ffaaaa;
+        }
+
+        @keyframes vhs-jitter {
+            0% { transform: translate(0);}
+            25% { transform: translate(1px, -1px);}
+            50% { transform: translate(-1px, 0);}
+            75% { transform: translate(0, 1px);}
+            100% { transform: translate(0);}
+        }
+
+        .glitch-active { animation: vhs-jitter 0.08s infinite; }
+
+        @media (max-width: 600px) {
+            .dialogue-box { font-size: 0.9rem; }
+            .stat { font-size: 0.7rem; }
+            .choice-btn { font-size: 0.75rem; }
+        }
+    </style>
+</head>
+<body>
+<div id="game-container">
+    <div class="cinematic-bg" id="bgImage"></div>
+    <div class="ui-layer">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+            <div class="stats-panel">
+                <div class="stat">❤️ TIN TƯỞNG: <span id="trustVal">50</span>%</div>
+                <div class="stat">🌙 CĂNG THẲNG: <span id="stressVal">0</span>%</div>
+                <div class="stat">🕯️ HOEN Ố: <span id="corruptVal">0</span>%</div>
+                <div class="stat">📖 KÝ ỨC: <span id="memoryVal">0</span>%</div>
+            </div>
+            <div class="clock" id="clockDisplay">⏰ 20:00</div>
+        </div>
+
+        <div class="dialogue-box">
+            <div class="typewriter-text" id="dialogueText">...</div>
+            <div class="choices" id="choicesContainer"></div>
+            <div style="text-align: center; margin-top: 12px;">
+                <button class="menu-btn" id="menuBtn">🏠 MENU CHÍNH</button>
+            </div>
+        </div>
+        <div class="scene-title" id="sceneName">--- hành lang vọng âm ---</div>
+    </div>
+</div>
+
+<audio id="bgmAudio" loop preload="auto">
+    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+</audio>
+<audio id="voiceAudio" preload="auto">
+    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+    // Audio settings
+    let audioSettings = { musicVol: 0.20, voiceVol: 0.60, sfxVol: 0.40 };
+    let ambientAudio = null;
+    let voicePlayer = null;
+
+    function loadAudioSettings() {
+        const saved = localStorage.getItem("silentRoomAudio");
+        if (saved) audioSettings = JSON.parse(saved);
+        ambientAudio = document.getElementById("bgmAudio");
+        voicePlayer = document.getElementById("voiceAudio");
+        if (ambientAudio) ambientAudio.volume = audioSettings.musicVol;
+        if (voicePlayer) voicePlayer.volume = audioSettings.voiceVol;
+    }
+
+    function playVoice(textHint) {
+        if (voicePlayer && audioSettings.voiceVol > 0) {
+            voicePlayer.currentTime = 0;
+            voicePlayer.play().catch(e=>console.log);
+        }
+    }
+
+    // Game State
+    let gameState = {
+        trust: 50, stress: 0, corruption: 0, memory: 0,
+        hour: 20, minute: 0, gameActive: true,
+        endingsUnlocked: []
+    };
+
+    let typewriterTimeout = null;
+    let isTyping = false;
+
+    function clamp(v,min,max){ return Math.min(max, Math.max(min, v)); }
+
+    function updateUI() {
+        document.getElementById("trustVal").innerText = Math.floor(gameState.trust);
+        document.getElementById("stressVal").innerText = Math.floor(gameState.stress);
+        document.getElementById("corruptVal").innerText = Math.floor(gameState.corruption);
+        document.getElementById("memoryVal").innerText = Math.floor(gameState.memory);
+        let timeStr = `${gameState.hour.toString().padStart(2,'0')}:${gameState.minute.toString().padStart(2,'0')}`;
+        document.getElementById("clockDisplay").innerHTML = `⏰ ${timeStr}`;
+        
+        if (gameState.stress >= 60 && !document.querySelector('.glitch-overlay')) {
+            let glitchDiv = document.createElement('div');
+            glitchDiv.className = 'glitch-overlay';
+            document.body.appendChild(glitchDiv);
+            document.getElementById("game-container").classList.add('glitch-active');
+        } else if (gameState.stress < 60 && document.querySelector('.glitch-overlay')) {
+            document.querySelector('.glitch-overlay').remove();
+            document.getElementById("game-container").classList.remove('glitch-active');
+        }
+        
+        let bgDiv = document.getElementById("bgImage");
+        let blurAmount = Math.min(6, gameState.corruption / 20);
+        bgDiv.style.filter = `contrast(1.1) brightness(${0.6 - gameState.corruption/180}) grayscale(${gameState.corruption/110}) blur(${blurAmount}px)`;
+    }
+
+    function advanceTime(mins=5) {
+        if (!gameState.gameActive) return;
+        gameState.minute += mins;
+        if (gameState.minute >= 60) { gameState.hour++; gameState.minute = 0; if (gameState.hour > 23) gameState.hour = 23; }
+        updateUI();
+    }
+
+    function modifyStats(dTrust, dStress, dCorrupt, dMemory) {
+        if (!gameState.gameActive) return;
+        gameState.trust = clamp(gameState.trust + dTrust, 0, 100);
+        gameState.stress = clamp(gameState.stress + dStress, 0, 100);
+        gameState.corruption = clamp(gameState.corruption + dCorrupt, 0, 100);
+        gameState.memory = clamp(gameState.memory + dMemory, 0, 100);
+        
+        if (gameState.corruption >= 85 && gameState.trust < 20) triggerEnding("bad");
+        if (gameState.memory >= 80 && gameState.trust >= 70 && gameState.corruption <= 25) triggerEnding("good");
+        if (gameState.stress >= 95) triggerEnding("neutral");
+        if (gameState.memory >= 70 && gameState.corruption >= 40 && gameState.trust <= 30) triggerEnding("secret");
+        updateUI();
+    }
+
+    function setBackground(key) {
+        const bgMap = {
+            hallway: "https://placehold.co/1920x1080/1a1210/2c1e1a?text=HÀNH+LANG+VẮNG+LẶNG",
+            childroom: "https://placehold.co/1920x1080/0f0c18/1f1a2e?text=CĂN+PHÒNG+TUỔI+THƠ",
+            classroom: "https://placehold.co/1920x1080/1c1b1a/3e2f2a?text=LỚP+HỌC+HOANG",
+            night_corridor: "https://placehold.co/1920x1080/050505/2f1414?text=LỐI+ĐI+ĐÊM",
+            memory_garden: "https://placehold.co/1920x1080/15222b/1d3e3a?text=VƯỜN+KÝ+ỨC",
+            door_room: "https://placehold.co/1920x1080/0a080f/2b1b2c?text=CÁNH+CỬA"
+        };
+        document.getElementById("bgImage").style.backgroundImage = `url('${bgMap[key]||bgMap.hallway}')`;
+    }
+
+    async function typewriterEffect(text, element, speed=30) {
+        if (typewriterTimeout) clearTimeout(typewriterTimeout);
+        isTyping = true;
+        element.innerHTML = "";
+        for (let i=0; i<text.length; i++) {
+            if (!gameState.gameActive) break;
+            element.innerHTML += text[i];
+            await new Promise(r=>setTimeout(r,speed));
+        }
+        isTyping = false;
+    }
+
+    async function showScene(scene) {
+        if (!gameState.gameActive) return;
+        setBackground(scene.bg);
+        document.getElementById("sceneName").innerText = scene.sceneTitle;
+        await typewriterEffect(scene.dialogue, document.getElementById("dialogueText"), 30);
+        if (scene.voiceLine) playVoice(scene.voiceLine);
+        const container = document.getElementById("choicesContainer");
+        container.innerHTML = "";
+        scene.choices.forEach(choice => {
+            let btn = document.createElement("button");
+            btn.innerText = choice.text;
+            btn.className = "choice-btn";
+            btn.onclick = () => { if(gameState.gameActive) choice.action(); };
+            container.appendChild(btn);
+        });
+    }
+
+    function triggerEnding(type) {
+        if (!gameState.gameActive) return;
+        gameState.gameActive = false;
+        let endingDesc = type === "good" ? "Bạn Đã Được Lắng Nghe" : 
+                        type === "neutral" ? "Không Ai Để Ý" :
+                        type === "bad" ? "Sự Im Lặng Ở Lại" : "Cánh Cửa Vẫn Mở";
+        if (!gameState.endingsUnlocked.includes(endingDesc)) gameState.endingsUnlocked.push(endingDesc);
+        localStorage.setItem("silentRoomEndings", JSON.stringify(gameState.endingsUnlocked));
+        document.getElementById("dialogueText").innerHTML = `[KẾT THÚC] --- ${endingDesc} ---\n\nNhững vọng âm của bạn còn ở lại trong căn phòng.\n\nNhấn MENU CHÍNH để quay lại.`;
+        document.getElementById("choicesContainer").innerHTML = "";
+        if (ambientAudio) ambientAudio.pause();
+        updateUI();
+    }
+
+    // ---- SCENES with metaphorical abuse symbolism ----
+    const scenes = {
+        hallway_start: {
+            bg: "hallway", sceneTitle: "hành lang - không bước chân",
+            dialogue: "Bạn đứng trong hành lang hẹp. Giấy dán tường bong tróc như lớp da cũ. Tiếng đồng hồ tích tắc không đều. Bóng bạn dường như quá cao tối nay.\n\nMột cánh cửa phía xa khép hờ.",
+            voiceLine: "hallway",
+            choices: [
+                { text: "🔍 Nhìn vào chiếc gương", action: () => { modifyStats(0,5,2,2); advanceTime(10); sceneTransition("mirror_scene"); } },
+                { text: "🚪 Bước vào phòng khách", action: () => { modifyStats(-2,7,3,0); advanceTime(15); sceneTransition("livingroom_stepfather"); } },
+                { text: "📓 Về phòng và vẽ", action: () => { modifyStats(5,-3,-1,10); advanceTime(20); sceneTransition("childroom_memory"); } }
+            ]
+        },
+        mirror_scene: {
+            bg: "night_corridor", sceneTitle: "tấm gương nứt",
+            dialogue: "Gương phản chiếu một đứa trẻ với đôi mắt trũng sâu. Phía sau bạn, một bóng người cao lớn thoáng qua rồi tan biến. Tiếng thì thầm: 'Hãy im lặng.'",
+            voiceLine: "mirror",
+            choices: [
+                { text: "Thì thầm 'Tôi ở đây'", action: () => { modifyStats(10,12,5,5); advanceTime(5); sceneTransition("hallway_start"); } },
+                { text: "Quay ngoắt lại", action: () => { modifyStats(-5,18,8,2); advanceTime(5); sceneTransition("livingroom_stepfather"); } }
+            ]
+        },
+        livingroom_stepfather: {
+            bg: "night_corridor", sceneTitle: "chiếc ghế bành nặng nề",
+            dialogue: "[Người đàn ông ngồi trong bóng tối, không quay mặt lại]\n\n'Sự im lặng hợp với con tối nay. Con biết điều gì xảy ra khi lời nói phá vỡ sự yên tĩnh mà.'\n\nTay ông ta đặt trên bàn, những ngón tay dài bất thường.",
+            voiceLine: "stepfather",
+            choices: [
+                { text: "Gật đầu và lặng lẽ rời đi", action: () => { modifyStats(-8,15,12,0); advanceTime(20); sceneTransition("hallway_start"); } },
+                { text: "Nói 'Con có tiếng nói'", action: () => { modifyStats(-15,20,18,10); advanceTime(25); sceneTransition("nightmare_hall"); } },
+                { text: "Hỏi về mẹ", action: () => { modifyStats(2,25,15,5); advanceTime(10); sceneTransition("broken_teacher"); } }
+            ]
+        },
+        nightmare_hall: {
+            bg: "night_corridor", sceneTitle: "hành lang xoắn vặn",
+            dialogue: "Tường chảy máu bóng tối. Giọng nói vọng về: 'Con đã phá vỡ giao ước.'\n\nTrên cổ tay bạn, những vết bầm tím cũ bỗng nhói lên. Có ai đó đã siết chặt.",
+            voiceLine: "nightmare",
+            choices: [
+                { text: "Chạy về phía ánh sáng le lói", action: () => { modifyStats(5,30,5,15); advanceTime(10); sceneTransition("classroom_friend"); } },
+                { text: "Trốn vào tủ quần áo", action: () => { modifyStats(-15,40,20,-5); advanceTime(20); sceneTransition("closet_silence"); } }
+            ]
+        },
+        classroom_friend: {
+            bg: "classroom", sceneTitle: "bàn ghế và lời thì thầm",
+            dialogue: "Bạn thân Leo ngồi cạnh cửa sổ. 'Cậu trông mệt mỏi quá. Lại là... ông ta à? Tớ tin cậu.'\n\nCậu ấy đưa bạn một bức vẽ về cánh cửa. Phía sau cánh cửa là ánh sáng.",
+            voiceLine: "friend",
+            choices: [
+                { text: "Nhận bức vẽ và tâm sự", action: () => { modifyStats(15,-10,-5,20); advanceTime(15); sceneTransition("memory_garden_scene"); } },
+                { text: "Lặng thinh và bỏ đi", action: () => { modifyStats(-5,5,10,0); advanceTime(10); sceneTransition("hallway_start"); } }
+            ]
+        },
+        memory_garden_scene: {
+            bg: "memory_garden", sceneTitle: "vườn ký ức xanh cỏ dại",
+            dialogue: "Bạn nhớ về một khu vườn trước ngày im lặng. Một đứa trẻ cười. Rồi màn sương xám nuốt chửng mọi thứ.\n\nMột cánh cửa xuất hiện, hé mở. Phía sau là tiếng bà ngoại ru à ơi.",
+            voiceLine: "garden",
+            choices: [
+                { text: "Nhẹ nhàng mở cửa", action: () => { modifyStats(20,-15,-15,35); advanceTime(0); sceneTransition("final_door"); } },
+                { text: "Sợ hãi bỏ đi", action: () => { modifyStats(-5,12,8,-5); advanceTime(20); sceneTransition("livingroom_stepfather"); } }
+            ]
+        },
+        childroom_memory: {
+            bg: "childroom", sceneTitle: "chú thỏ bông cũ",
+            dialogue: "Hộp nhạc trong phòng bạn reo giai điệu vỡ vụn. Dưới gầm giường, bạn tìm thấy bức vẽ từ những ngày còn vui. Chữ 'CỨU' mờ nhạt.",
+            voiceLine: "childroom",
+            choices: [
+                { text: "Giữ bức vẽ làm bằng chứng", action: () => { modifyStats(5,-5,-2,20); advanceTime(10); sceneTransition("hallway_start"); } },
+                { text: "Xé nát (tê liệt)", action: () => { modifyStats(-10,15,12,-15); advanceTime(15); sceneTransition("livingroom_stepfather"); } }
+            ]
+        },
+        broken_teacher: {
+            bg: "classroom", sceneTitle: "phòng giam tiếng vọng",
+            dialogue: "Cô giáo Minh nhìn bạn lo lắng. 'Điểm số của em đang giảm. Mọi thứ ở nhà ổn chứ?'\n\nMắt cô liếc về phía cửa, nơi bóng người đàn ông vừa lướt qua.",
+            voiceLine: "teacher",
+            choices: [
+                { text: "'Em ổn' (im lặng)", action: () => { modifyStats(-8,10,10,-5); advanceTime(20); sceneTransition("hallway_start"); } },
+                { text: "'Em cần giúp đỡ'", action: () => { modifyStats(15,-5,-10,20); advanceTime(15); sceneTransition("memory_garden_scene"); } }
+            ]
+        },
+        closet_silence: {
+            bg: "night_corridor", sceneTitle: "hơi thở trong bóng tối",
+            dialogue: "Trong tủ quần áo, bạn nghe thấy tiếng bước chân nặng nề. 'Con ngoan khi im lặng.'\n\nHàng giờ trôi qua. Một vệt sáng le lói từ khe cửa.",
+            voiceLine: "closet",
+            choices: [
+                { text: "Bò về phía ánh sáng", action: () => { modifyStats(-20,40,15,5); advanceTime(25); sceneTransition("hallway_start"); } }
+            ]
+        },
+        final_door: {
+            bg: "door_room", sceneTitle: "ngưỡng cửa",
+            dialogue: "Cánh cửa gỗ trắng. Sau nó, làn gió ấm và tiếng cười của chính bạn thuở nào.\n\nGiọng người đàn ông phía sau nhạt nhòa: 'Con không bao giờ được phép nói...'\n\nBạn có bước qua không?",
+            voiceLine: "final",
+            choices: [
+                { text: "BƯỚC QUA CÁNH CỬA (chữa lành)", action: () => { modifyStats(40,-50,-40,60); if(gameState.memory>=70 && gameState.corruption<=40) triggerEnding("good"); else triggerEnding("neutral"); } },
+                { text: "Ở lại căn phòng im lặng", action: () => { modifyStats(-30,30,25,-15); triggerEnding("bad"); } }
+            ]
+        }
+    };
+
+    function sceneTransition(sceneId) {
+        if (scenes[sceneId]) showScene(scenes[sceneId]);
+        else showScene(scenes.hallway_start);
+    }
+
+    function resetGameToMenu() {
+        if (typewriterTimeout) clearTimeout(typewriterTimeout);
+        if (ambientAudio) ambientAudio.pause();
+        window.location.href = "index.html";
+    }
+
+    function startGameSession() {
+        loadAudioSettings();
+        if (ambientAudio) {
+            ambientAudio.volume = audioSettings.musicVol;
+            ambientAudio.loop = true;
+            ambientAudio.play().catch(e=>console.log);
+        }
+        sceneTransition("hallway_start");
+        
+        setInterval(() => {
+            if (gameState.gameActive) {
+                if (gameState.hour >= 22 || gameState.hour <= 5) {
+                    modifyStats(0, gameState.corruption > 30 ? 2 : 1, 0, 0);
+                }
+                if (gameState.stress > 70) modifyStats(-1, 1, 1, 0);
+            }
+        }, 15000);
+    }
+
+    document.getElementById("menuBtn").onclick = resetGameToMenu;
+    startGameSession();
+
+    // Overlay effects
+    let vignetteDiv = document.createElement('div'); vignetteDiv.className = 'vignette'; document.body.appendChild(vignetteDiv);
+</script>
+</body>
+</html>
