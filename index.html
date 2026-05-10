@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Silent Room - Main Menu | Psychological Horror Game</title>
+    <title>Silent Room - Căn Phòng Câm Lặng | Nguyễn Duy Anh</title>
     <style>
         * {
             margin: 0;
@@ -37,7 +37,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            box-shadow: inset 0 0 100px rgba(0,0,0,0.8);
+            box-shadow: inset 0 0 120px rgba(0,0,0,0.85);
             pointer-events: none;
             z-index: 997;
         }
@@ -48,16 +48,16 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJmIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iLjciIG51bU9jdGF2ZXM9IjMiLz48L2ZpbHRlcj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWx0ZXI9InVybCgjZikiIG9wYWNpdHk9IjAuMDQiLz48L3N2Zz4=');
+            background: repeating-radial-gradient(circle at 20% 30%, rgba(0,0,0,0.05) 0px, rgba(0,0,0,0.05) 2px, transparent 2px, transparent 4px);
             pointer-events: none;
             z-index: 996;
-            opacity: 0.15;
-            animation: staticMove 0.5s infinite;
+            opacity: 0.3;
+            animation: staticMove 0.3s infinite;
         }
 
         @keyframes staticMove {
-            0% { transform: translate(0,0); opacity: 0.12; }
-            100% { transform: translate(2px, -1px); opacity: 0.18; }
+            0% { transform: translate(0,0); opacity: 0.2; }
+            100% { transform: translate(1px, -1px); opacity: 0.35; }
         }
 
         #main-menu {
@@ -72,53 +72,72 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            transition: opacity 0.8s ease;
         }
 
         .menu-title {
-            font-size: 4rem;
-            letter-spacing: 12px;
+            font-size: 4.2rem;
+            letter-spacing: 14px;
             color: #aa5252;
-            text-shadow: 0 0 15px #ff0000, 0 0 5px #2a0000, 0 0 30px rgba(170,0,0,0.5);
-            margin-bottom: 30px;
+            text-shadow: 0 0 20px #ff0000, 0 0 8px #2a0000, 0 0 40px rgba(170,0,0,0.5);
+            margin-bottom: 20px;
             font-weight: bold;
             animation: titleFlicker 3s infinite;
             text-align: center;
         }
 
         @keyframes titleFlicker {
-            0% { opacity: 1; text-shadow: 0 0 15px #ff0000; letter-spacing: 12px; }
-            50% { opacity: 0.9; text-shadow: 0 0 5px #aa2222; letter-spacing: 14px; }
-            100% { opacity: 1; text-shadow: 0 0 15px #ff0000; letter-spacing: 12px; }
+            0%, 100% { opacity: 1; text-shadow: 0 0 20px #ff0000; letter-spacing: 14px; }
+            25% { opacity: 0.95; text-shadow: 0 0 5px #aa2222; letter-spacing: 13px; }
+            50% { opacity: 0.9; text-shadow: 0 0 8px #ff4444; letter-spacing: 15px; }
+            75% { opacity: 0.95; text-shadow: 0 0 10px #cc3333; letter-spacing: 13px; }
         }
 
         .subtitle {
-            color: #885555;
-            margin-bottom: 40px;
-            font-size: 0.9rem;
-            letter-spacing: 6px;
+            color: #886666;
+            margin-bottom: 50px;
+            font-size: 0.85rem;
+            letter-spacing: 8px;
             text-transform: uppercase;
             animation: fadePulse 4s infinite;
         }
 
         @keyframes fadePulse {
-            0%, 100% { opacity: 0.6; }
-            50% { opacity: 1; }
+            0%, 100% { opacity: 0.6; letter-spacing: 8px; }
+            50% { opacity: 1; letter-spacing: 10px; }
         }
 
         .menu-btn {
-            background: rgba(0,0,0,0.75);
+            background: rgba(0,0,0,0.8);
             border: 2px solid #6a2e2e;
             color: #ddbb99;
             font-family: 'Courier New', monospace;
             font-size: 1.2rem;
-            padding: 10px 28px;
-            margin: 10px;
-            width: 260px;
+            padding: 12px 32px;
+            margin: 8px;
+            width: 300px;
             cursor: pointer;
             text-align: center;
             transition: all 0.3s;
             letter-spacing: 3px;
             backdrop-filter: blur(4px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .menu-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(170,70,70,0.25), transparent);
+            transition: left 0.6s;
+        }
+
+        .menu-btn:hover::before {
+            left: 100%;
         }
 
         .menu-btn:hover {
@@ -126,30 +145,31 @@
             border-color: #bb5555;
             color: #ffffff;
             transform: scale(1.02);
-            box-shadow: 0 0 20px rgba(180,0,0,0.5);
+            box-shadow: 0 0 25px rgba(180,0,0,0.5);
         }
 
         .lang-selector {
-            margin-top: 30px;
+            margin-top: 35px;
             display: flex;
-            gap: 20px;
+            gap: 25px;
         }
 
         .lang-btn {
             background: #110a0a;
             border: 1px solid #5a3a3a;
             color: #aa8888;
-            padding: 6px 20px;
+            padding: 6px 22px;
             cursor: pointer;
             font-family: monospace;
             transition: all 0.2s;
+            font-size: 0.9rem;
         }
 
         .lang-btn.active {
             background: #442222;
             color: white;
             border-color: #cc7777;
-            box-shadow: 0 0 8px rgba(200,0,0,0.4);
+            box-shadow: 0 0 12px rgba(200,0,0,0.4);
         }
 
         .lang-btn:hover {
@@ -157,29 +177,31 @@
             border-color: #aa6666;
         }
 
-        /* Settings Panel */
         .settings-panel {
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.95);
+            background: rgba(0,0,0,0.96);
             border: 2px solid #6a2e2e;
             padding: 30px;
-            width: 350px;
+            width: 400px;
             max-width: 90%;
             z-index: 2100;
             display: none;
             flex-direction: column;
-            gap: 20px;
-            backdrop-filter: blur(10px);
+            gap: 18px;
+            backdrop-filter: blur(12px);
             font-family: monospace;
+            box-shadow: 0 0 50px rgba(0,0,0,0.9);
         }
 
         .settings-panel h3 {
             color: #aa5252;
             text-align: center;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+            letter-spacing: 2px;
         }
 
         .setting-row {
@@ -187,27 +209,40 @@
             justify-content: space-between;
             align-items: center;
             color: #ddbb99;
+            padding: 8px 0;
         }
 
         .setting-row input {
-            width: 150px;
+            width: 180px;
             cursor: pointer;
             background: #221111;
             accent-color: #aa4444;
+        }
+
+        .setting-row span:first-child {
+            font-size: 0.95rem;
+        }
+
+        .setting-value {
+            min-width: 45px;
+            text-align: right;
+            color: #dd8888;
         }
 
         .close-settings {
             background: #2a0a0a;
             border: 1px solid #aa5555;
             color: #ddbb99;
-            padding: 8px;
-            margin-top: 15px;
+            padding: 10px;
+            margin-top: 20px;
             cursor: pointer;
             text-align: center;
+            transition: all 0.2s;
         }
 
         .close-settings:hover {
             background: #441111;
+            color: white;
         }
 
         .credits-panel {
@@ -215,16 +250,19 @@
             bottom: 25px;
             right: 25px;
             z-index: 2001;
-            color: #554444;
+            color: #665555;
             font-size: 0.7rem;
             cursor: pointer;
-            background: rgba(0,0,0,0.6);
-            padding: 6px 12px;
+            background: rgba(0,0,0,0.5);
+            padding: 6px 14px;
             border-radius: 4px;
+            transition: all 0.2s;
+            letter-spacing: 1px;
         }
 
         .credits-panel:hover {
-            color: #aa7777;
+            color: #aa8888;
+            background: rgba(30,0,0,0.7);
         }
 
         .version {
@@ -233,103 +271,144 @@
             left: 25px;
             color: #332222;
             font-size: 0.6rem;
+            font-family: monospace;
         }
 
         .warning {
-            margin-top: 30px;
+            margin-top: 35px;
             font-size: 0.7rem;
-            color: #552222;
+            color: #553333;
             text-align: center;
-            max-width: 500px;
+            max-width: 550px;
+            line-height: 1.5;
         }
 
         @media (max-width: 600px) {
-            .menu-title { font-size: 2rem; letter-spacing: 6px; }
-            .menu-btn { width: 220px; font-size: 1rem; }
+            .menu-title { font-size: 2.2rem; letter-spacing: 8px; }
+            .menu-btn { width: 260px; font-size: 1rem; padding: 10px 20px; }
+            .subtitle { font-size: 0.6rem; letter-spacing: 5px; }
+            .settings-panel { width: 320px; padding: 20px; }
         }
     </style>
 </head>
 <body>
 
 <div id="main-menu">
-    <div class="menu-title">SILENT ROOM</div>
-    <div class="subtitle">căn phòng câm lặng</div>
+    <div class="menu-title" id="menuTitle">SILENT ROOM</div>
+    <div class="subtitle" id="subtitleText">căn phòng câm lặng</div>
     
-    <div class="menu-btn" id="play-btn">▶ BẮT ĐẦU</div>
-    <div class="menu-btn" id="settings-btn">⚙️ CÀI ĐẶT</div>
-    <div class="menu-btn" id="credits-btn">📜 CREDITS</div>
+    <div class="menu-btn" id="play-btn">▶ BẮT ĐẦU HÀNH TRÌNH</div>
+    <div class="menu-btn" id="continue-btn">🔄 TIẾP TỤC (TỰ ĐỘNG)</div>
+    <div class="menu-btn" id="settings-btn">⚙️ CÀI ĐẶT & ÂM THANH</div>
+    <div class="menu-btn" id="credits-btn">📜 CREDITS & THÔNG TIN</div>
     
     <div class="lang-selector">
-        <div class="lang-btn active" data-lang="vn">TIẾNG VIỆT</div>
-        <div class="lang-btn" data-lang="en">ENGLISH</div>
+        <div class="lang-btn" data-lang="vn">🇻🇳 TIẾNG VIỆT</div>
+        <div class="lang-btn" data-lang="en">🇬🇧 ENGLISH</div>
     </div>
     
     <div class="warning" id="warningMsg">
-        "Trò chơi khám phá ký ức, sự im lặng và tổn thương thời thơ ấu qua biểu tượng.<br>
-        Mọi hình ảnh đều là ẩn dụ — không có nội dung tường minh."
+        "Trò chơi khám phá ký ức, sự im lặng và hành trình hồi phục qua biểu tượng.<br>
+        Mọi hình ảnh đều là ẩn dụ — không có nội dung bạo lực tường minh.<br>
+        Hãy lắng nghe những gì không được nói ra."
     </div>
     
     <div class="credits-panel" id="mini-credits">© Nguyễn Duy Anh — The Door Stays Open</div>
-    <div class="version">v2.0 — liminal horror</div>
+    <div class="version">v4.0 — đã sửa lỗi âm lượng + ngôn ngữ</div>
 </div>
 
-<!-- Settings Panel -->
 <div id="settingsPanel" class="settings-panel">
-    <h3>🎧 CÀI ĐẶT</h3>
+    <h3 id="settingsTitle">🎧 ÂM THANH & CÀI ĐẶT</h3>
     <div class="setting-row">
-        <span>🎵 Nhạc nền</span>
+        <span id="musicLabel">🎵 Nhạc nền</span>
         <input type="range" id="musicVolume" min="0" max="100" value="20">
+        <span class="setting-value" id="musicValue">20%</span>
     </div>
     <div class="setting-row">
-        <span>💬 Giọng nhân vật</span>
-        <input type="range" id="voiceVolume" min="0" max="100" value="60">
+        <span id="voiceLabel">💬 Giọng nhân vật</span>
+        <input type="range" id="voiceVolume" min="0" max="100" value="55">
+        <span class="setting-value" id="voiceValue">55%</span>
     </div>
     <div class="setting-row">
-        <span>⚡ Hiệu ứng âm thanh</span>
+        <span id="sfxLabel">⚡ Hiệu ứng âm thanh</span>
         <input type="range" id="sfxVolume" min="0" max="100" value="40">
+        <span class="setting-value" id="sfxValue">40%</span>
     </div>
-    <div class="close-settings" id="closeSettings">ĐÓNG</div>
+    <div class="setting-row">
+        <span id="vhsLabel">📺 Hiệu ứng VHS</span>
+        <input type="range" id="vhsIntensity" min="0" max="100" value="60">
+        <span class="setting-value" id="vhsValue">60%</span>
+    </div>
+    <div class="setting-row">
+        <span id="speedLabel">⏩ Tốc độ chữ</span>
+        <input type="range" id="textSpeed" min="10" max="80" value="30">
+        <span class="setting-value" id="speedValue">30ms</span>
+    </div>
+    <div class="close-settings" id="closeSettings">🔒 LƯU & ĐÓNG</div>
 </div>
 
 <script>
-    // Language data
     const langData = {
         vn: {
             title: "SILENT ROOM",
-            play: "▶ BẮT ĐẦU",
-            settings: "⚙️ CÀI ĐẶT",
-            credits: "📜 CREDITS",
-            creditsText: "═══════════════════════\nCĂN PHÒNG CÂM LẶNG\n═══════════════════════\n\nTÁC GIẢ: NGUYỄN DUY ANH\n\nKỊCH BẢN & ĐẠO DIỄN: Nguyễn Duy Anh\nÂM THANH: Liminal Echoes\nĐỒ HỌA: Biểu tượng ký ức\n\n\"Những cánh cửa vẫn mở cho những ai dám nhớ.\"\n\nCảm ơn bạn đã bước vào căn phòng này.\nHãy lắng nghe sự im lặng.\n═══════════════════════",
-            warning: "Trò chơi khám phá ký ức, sự im lặng và tổn thương thời thơ ấu qua biểu tượng.\nMọi hình ảnh đều là ẩn dụ — không có nội dung tường minh."
+            subtitle: "căn phòng câm lặng",
+            play: "▶ BẮT ĐẦU HÀNH TRÌNH",
+            continue: "🔄 TIẾP TỤC (TỰ ĐỘNG)",
+            settings: "⚙️ CÀI ĐẶT & ÂM THANH",
+            credits: "📜 CREDITS & THÔNG TIN",
+            settingsTitle: "🎧 ÂM THANH & CÀI ĐẶT",
+            musicLabel: "🎵 Nhạc nền",
+            voiceLabel: "💬 Giọng nhân vật",
+            sfxLabel: "⚡ Hiệu ứng âm thanh",
+            vhsLabel: "📺 Hiệu ứng VHS",
+            speedLabel: "⏩ Tốc độ chữ",
+            closeSettings: "🔒 LƯU & ĐÓNG",
+            creditsText: "═══════════════════════════════\nCĂN PHÒNG CÂM LẶNG\n═══════════════════════════════\n\n🎭 TÁC GIẢ: NGUYỄN DUY ANH\n\n📝 KỊCH BẢN & ĐẠO DIỄN: Nguyễn Duy Anh\n🎼 ÂM THANH: Liminal Echoes Studio\n🎨 ĐỒ HỌA & BIỂU TƯỢNG: Memory Weaver\n\n\"Căn phòng này dành cho những ai từng im lặng.\"\n\nCảm ơn bạn đã bước qua cánh cửa.\nHãy để ký ức dẫn lối.\n\n═══════════════════════════════\n25+ phân cảnh · 4 kết thúc · Hệ thống ký ức",
+            warning: "Trò chơi khám phá ký ức, sự im lặng và hành trình hồi phục qua biểu tượng.\nMọi hình ảnh đều là ẩn dụ — không có nội dung bạo lực tường minh.\nHãy lắng nghe những gì không được nói ra."
         },
         en: {
             title: "SILENT ROOM",
-            play: "▶ BEGIN",
-            settings: "⚙️ SETTINGS",
-            credits: "📜 CREDITS",
-            creditsText: "═══════════════════════\nSILENT ROOM\n═══════════════════════\n\nCREATOR: NGUYEN DUY ANH\n\nDIRECTOR & WRITER: Nguyen Duy Anh\nSOUND DESIGN: Liminal Echoes\nART: Memory Symbols\n\n\"The doors remain open for those who dare to remember.\"\n\nThank you for entering this room.\nListen to the silence.\n═══════════════════════",
-            warning: "This game explores childhood memories, silence and trauma through symbolism.\nNo explicit content — only atmosphere and metaphor."
+            subtitle: "the silent room",
+            play: "▶ BEGIN THE JOURNEY",
+            continue: "🔄 CONTINUE (AUTO)",
+            settings: "⚙️ SETTINGS & AUDIO",
+            credits: "📜 CREDITS & INFO",
+            settingsTitle: "🎧 SOUND & SETTINGS",
+            musicLabel: "🎵 Background Music",
+            voiceLabel: "💬 Character Voice",
+            sfxLabel: "⚡ Sound Effects",
+            vhsLabel: "📺 VHS Effect",
+            speedLabel: "⏩ Text Speed",
+            closeSettings: "🔒 SAVE & CLOSE",
+            creditsText: "═══════════════════════════════\nSILENT ROOM\n═══════════════════════════════\n\n🎭 CREATOR: NGUYEN DUY ANH\n\n📝 WRITER & DIRECTOR: Nguyen Duy Anh\n🎼 SOUND DESIGN: Liminal Echoes Studio\n🎨 ART & SYMBOLISM: Memory Weaver\n\n\"This room is for those who were once silent.\"\n\nThank you for stepping through the door.\nLet memory guide you.\n\n═══════════════════════════════\n25+ scenes · 4 endings · Memory system",
+            warning: "This game explores childhood memories, silence and recovery through symbolism.\nNo explicit violence — only atmosphere and metaphor.\nListen to the unspoken."
         }
     };
 
     let currentLang = "vn";
     let menuAudio = null;
-
-    // Audio settings storage
     let audioSettings = {
-        musicVol: 0.20,
-        voiceVol: 0.60,
-        sfxVol: 0.40
+        musicVol: 0.20, voiceVol: 0.55, sfxVol: 0.40, vhsIntensity: 60, textSpeed: 30
     };
 
     function loadSettings() {
         const saved = localStorage.getItem("silentRoomAudio");
         if (saved) {
-            audioSettings = JSON.parse(saved);
+            const parsed = JSON.parse(saved);
+            audioSettings = { ...audioSettings, ...parsed };
         }
         document.getElementById("musicVolume").value = audioSettings.musicVol * 100;
         document.getElementById("voiceVolume").value = audioSettings.voiceVol * 100;
         document.getElementById("sfxVolume").value = audioSettings.sfxVol * 100;
+        document.getElementById("vhsIntensity").value = audioSettings.vhsIntensity;
+        document.getElementById("textSpeed").value = audioSettings.textSpeed;
+        
+        document.getElementById("musicValue").innerText = Math.round(audioSettings.musicVol * 100) + "%";
+        document.getElementById("voiceValue").innerText = Math.round(audioSettings.voiceVol * 100) + "%";
+        document.getElementById("sfxValue").innerText = Math.round(audioSettings.sfxVol * 100) + "%";
+        document.getElementById("vhsValue").innerText = audioSettings.vhsIntensity + "%";
+        document.getElementById("speedValue").innerText = audioSettings.textSpeed + "ms";
+        
         if (menuAudio) menuAudio.volume = audioSettings.musicVol;
     }
 
@@ -338,29 +417,56 @@
     }
 
     function initMenuAudio() {
-        menuAudio = document.getElementById("menuAmbient");
-        if (menuAudio) {
-            menuAudio.volume = audioSettings.musicVol;
-            menuAudio.loop = true;
-            document.body.addEventListener('click', () => {
-                if (menuAudio && menuAudio.paused) menuAudio.play().catch(e=>console.log);
-            }, { once: true });
-        }
+        menuAudio = new Audio();
+        menuAudio.loop = true;
+        menuAudio.volume = audioSettings.musicVol;
+        menuAudio.src = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3";
+        document.body.appendChild(menuAudio);
+        
+        document.body.addEventListener('click', () => {
+            if (menuAudio && menuAudio.paused && document.getElementById("main-menu").style.display !== "none") {
+                menuAudio.play().catch(e => console.log("Audio play blocked"));
+            }
+        }, { once: true });
     }
 
     function playMenuAmbient() {
-        if (menuAudio && menuAudio.paused) menuAudio.play().catch(e=>console.log);
+        if (menuAudio && menuAudio.paused && document.getElementById("main-menu").style.display !== "none") {
+            menuAudio.play().catch(e => console.log);
+        }
+    }
+
+    function updateUILanguage() {
+        const lang = langData[currentLang];
+        document.getElementById("menuTitle").innerText = lang.title;
+        document.getElementById("subtitleText").innerText = lang.subtitle;
+        document.getElementById("play-btn").innerText = lang.play;
+        document.getElementById("continue-btn").innerText = lang.continue;
+        document.getElementById("settings-btn").innerText = lang.settings;
+        document.getElementById("credits-btn").innerText = lang.credits;
+        document.getElementById("warningMsg").innerHTML = lang.warning;
+        
+        // Update settings panel
+        document.getElementById("settingsTitle").innerText = lang.settingsTitle;
+        document.getElementById("musicLabel").innerHTML = lang.musicLabel;
+        document.getElementById("voiceLabel").innerHTML = lang.voiceLabel;
+        document.getElementById("sfxLabel").innerHTML = lang.sfxLabel;
+        document.getElementById("vhsLabel").innerHTML = lang.vhsLabel;
+        document.getElementById("speedLabel").innerHTML = lang.speedLabel;
+        document.getElementById("closeSettings").innerHTML = lang.closeSettings;
     }
 
     function setLanguage(lang) {
         currentLang = lang;
-        document.querySelectorAll(".lang-btn").forEach(btn => btn.classList.remove("active"));
-        document.querySelector(`.lang-btn[data-lang="${lang}"]`).classList.add("active");
-        document.querySelector(".menu-title").innerText = langData[lang].title;
-        document.getElementById("play-btn").innerText = langData[lang].play;
-        document.getElementById("settings-btn").innerText = langData[lang].settings;
-        document.getElementById("credits-btn").innerText = langData[lang].credits;
-        document.getElementById("warningMsg").innerHTML = langData[lang].warning;
+        document.querySelectorAll(".lang-btn").forEach(btn => {
+            if (btn.getAttribute("data-lang") === lang) {
+                btn.classList.add("active");
+            } else {
+                btn.classList.remove("active");
+            }
+        });
+        updateUILanguage();
+        localStorage.setItem("silentRoomLang", currentLang);
     }
 
     function showCredits() {
@@ -377,14 +483,24 @@
         if (menuAudio) menuAudio.volume = audioSettings.musicVol;
     }
 
-    function startGame() {
+    function startNewGame() {
+        if (menuAudio) menuAudio.pause();
+        localStorage.removeItem("silentRoomSave");
+        localStorage.setItem("silentRoomAudio", JSON.stringify(audioSettings));
+        localStorage.setItem("gameLanguage", currentLang);
+        window.location.href = "game.html?new=true";
+    }
+
+    function continueGame() {
         if (menuAudio) menuAudio.pause();
         localStorage.setItem("silentRoomAudio", JSON.stringify(audioSettings));
+        localStorage.setItem("gameLanguage", currentLang);
         window.location.href = "game.html";
     }
 
     // Event listeners
-    document.getElementById("play-btn").onclick = startGame;
+    document.getElementById("play-btn").onclick = startNewGame;
+    document.getElementById("continue-btn").onclick = continueGame;
     document.getElementById("settings-btn").onclick = openSettings;
     document.getElementById("credits-btn").onclick = showCredits;
     document.getElementById("closeSettings").onclick = closeSettings;
@@ -393,32 +509,54 @@
     // Volume controls
     document.getElementById("musicVolume").oninput = (e) => {
         audioSettings.musicVol = e.target.value / 100;
+        document.getElementById("musicValue").innerText = e.target.value + "%";
         if (menuAudio) menuAudio.volume = audioSettings.musicVol;
     };
     document.getElementById("voiceVolume").oninput = (e) => {
         audioSettings.voiceVol = e.target.value / 100;
+        document.getElementById("voiceValue").innerText = e.target.value + "%";
     };
     document.getElementById("sfxVolume").oninput = (e) => {
         audioSettings.sfxVol = e.target.value / 100;
+        document.getElementById("sfxValue").innerText = e.target.value + "%";
+    };
+    document.getElementById("vhsIntensity").oninput = (e) => {
+        audioSettings.vhsIntensity = parseInt(e.target.value);
+        document.getElementById("vhsValue").innerText = e.target.value + "%";
+        const noiseDiv = document.querySelector('.static-noise');
+        if (noiseDiv) noiseDiv.style.opacity = audioSettings.vhsIntensity / 200;
+    };
+    document.getElementById("textSpeed").oninput = (e) => {
+        audioSettings.textSpeed = parseInt(e.target.value);
+        document.getElementById("speedValue").innerText = e.target.value + "ms";
     };
 
+    // Language buttons
     document.querySelectorAll(".lang-btn").forEach(btn => {
-        btn.onclick = () => setLanguage(btn.getAttribute("data-lang"));
+        btn.onclick = () => {
+            const lang = btn.getAttribute("data-lang");
+            setLanguage(lang);
+        };
     });
 
-    // Add audio elements
-    const audioHTML = `<audio id="menuAmbient" loop preload="auto"><source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3" type="audio/mpeg"></audio>`;
-    document.body.insertAdjacentHTML('beforeend', audioHTML);
+    // Load saved language
+    const savedLang = localStorage.getItem("silentRoomLang");
+    if (savedLang && (savedLang === "vn" || savedLang === "en")) {
+        setLanguage(savedLang);
+    } else {
+        setLanguage("vn");
+    }
 
+    // Initialize
     loadSettings();
     initMenuAudio();
-    setLanguage("vn");
-    playMenuAmbient();
+    setTimeout(() => playMenuAmbient(), 500);
 
     // Overlay effects
     let crtDiv = document.createElement('div'); crtDiv.className = 'crt-overlay'; document.body.appendChild(crtDiv);
     let vignetteDiv = document.createElement('div'); vignetteDiv.className = 'vignette'; document.body.appendChild(vignetteDiv);
     let noiseDiv = document.createElement('div'); noiseDiv.className = 'static-noise'; document.body.appendChild(noiseDiv);
+    noiseDiv.style.opacity = audioSettings.vhsIntensity / 200;
 </script>
 </body>
 </html>
