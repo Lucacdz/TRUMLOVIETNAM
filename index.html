@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Silent Room | A Psychological Horror Game</title>
+    <title>Silent Room | Psychological Horror Game</title>
     <style>
         * {
             margin: 0;
@@ -13,72 +13,166 @@
         }
 
         body {
-            background: #010101;
+            background: #000000;
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             font-family: 'Courier New', 'VT323', monospace;
             overflow: hidden;
             position: relative;
         }
 
-        /* VHS overlay effect */
-        body::before {
-            content: "";
+        /* CRT and VHS overlays */
+        .crt-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: repeating-linear-gradient(0deg, rgba(0,0,0,0.3) 0px, rgba(0,0,0,0.3) 2px, transparent 2px, transparent 6px);
+            background: repeating-linear-gradient(0deg, rgba(0,0,0,0.25) 0px, rgba(0,0,0,0.25) 2px, transparent 2px, transparent 6px);
             pointer-events: none;
-            z-index: 999;
-            opacity: 0.4;
+            z-index: 998;
         }
 
-        /* Glitch flash class (dynamic) */
-        .glitch-overlay {
+        .vignette {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(255, 0, 100, 0.15);
+            box-shadow: inset 0 0 100px rgba(0,0,0,0.8);
+            pointer-events: none;
+            z-index: 997;
+        }
+
+        .glitch-flash {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 0, 100, 0.1);
             mix-blend-mode: screen;
             pointer-events: none;
-            z-index: 1000;
-            animation: glitchFlicker 0.08s infinite;
+            z-index: 999;
+            animation: glitchPulse 0.15s infinite;
+            opacity: 0;
         }
 
-        @keyframes glitchFlicker {
+        @keyframes glitchPulse {
             0% { opacity: 0; }
-            20% { opacity: 0.4; background: rgba(0, 255, 255, 0.2); transform: translate(1px, -1px);}
-            40% { opacity: 0; }
-            60% { opacity: 0.3; background: rgba(255, 0, 255, 0.2); transform: translate(-1px, 1px);}
+            10% { opacity: 0.4; background: rgba(0, 255, 255, 0.2); transform: translate(1px, -1px);}
+            20% { opacity: 0; }
+            30% { opacity: 0.3; background: rgba(255, 0, 255, 0.2); transform: translate(-1px, 1px);}
             100% { opacity: 0; }
         }
 
+        /* Main Menu Styles */
+        #main-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at center, #0a0508 0%, #010001 100%);
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 1s ease;
+        }
+
+        .menu-title {
+            font-size: 4rem;
+            letter-spacing: 12px;
+            color: #aa5252;
+            text-shadow: 0 0 15px #ff0000, 0 0 5px #2a0000;
+            margin-bottom: 50px;
+            font-weight: bold;
+            animation: titleFlicker 3s infinite;
+        }
+
+        @keyframes titleFlicker {
+            0% { opacity: 1; text-shadow: 0 0 15px #ff0000; }
+            50% { opacity: 0.9; text-shadow: 0 0 5px #aa2222; }
+            100% { opacity: 1; text-shadow: 0 0 15px #ff0000; }
+        }
+
+        .menu-btn {
+            background: rgba(0,0,0,0.7);
+            border: 2px solid #6a2e2e;
+            color: #ddbb99;
+            font-family: 'Courier New', monospace;
+            font-size: 1.3rem;
+            padding: 12px 32px;
+            margin: 12px;
+            width: 260px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+            letter-spacing: 3px;
+        }
+
+        .menu-btn:hover {
+            background: #331111;
+            border-color: #bb5555;
+            color: #ffffff;
+            transform: scale(1.02);
+            box-shadow: 0 0 15px rgba(180,0,0,0.5);
+        }
+
+        .lang-selector {
+            margin-top: 40px;
+            display: flex;
+            gap: 20px;
+        }
+
+        .lang-btn {
+            background: #110a0a;
+            border: 1px solid #5a3a3a;
+            color: #aa8888;
+            padding: 6px 16px;
+            cursor: pointer;
+            font-family: monospace;
+        }
+
+        .lang-btn.active {
+            background: #442222;
+            color: white;
+            border-color: #cc7777;
+        }
+
+        .credits-panel {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 2001;
+            color: #554444;
+            font-size: 0.7rem;
+            cursor: pointer;
+            background: rgba(0,0,0,0.5);
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+
+        /* Game Container */
         #game-container {
             width: 100vw;
             height: 100vh;
             background: radial-gradient(circle at center, #0a0c12 0%, #020304 100%);
-            display: flex;
+            display: none;
             flex-direction: column;
             position: relative;
             overflow-y: auto;
-            scroll-behavior: smooth;
         }
 
-        /* cinematic letterbox */
         .cinematic-bg {
             position: absolute;
             width: 100%;
             height: 100%;
             background-size: cover;
             background-position: center;
-            filter: contrast(1.2) brightness(0.6) grayscale(0.4);
-            transition: filter 0.3s;
+            filter: contrast(1.2) brightness(0.55) grayscale(0.4);
+            transition: filter 0.4s;
             z-index: 0;
         }
 
@@ -93,28 +187,23 @@
             backdrop-filter: blur(3px);
         }
 
-        /* Status bars */
         .stats-panel {
             display: flex;
             gap: 20px;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0,0,0,0.75);
             padding: 10px 20px;
             border-radius: 4px;
-            font-family: monospace;
-            font-weight: bold;
             border-left: 4px solid #8b0000;
-            backdrop-filter: blur(8px);
+            flex-wrap: wrap;
         }
 
         .stat {
-            font-size: 1.1rem;
+            font-size: 1rem;
             color: #bcbcbc;
             letter-spacing: 1px;
         }
 
-        .stat span {
-            color: #d46b6b;
-        }
+        .stat span { color: #d46b6b; }
 
         .clock {
             font-size: 1.3rem;
@@ -125,26 +214,23 @@
             text-shadow: 0 0 4px red;
         }
 
-        /* dialogue container */
         .dialogue-box {
-            background: rgba(0, 0, 0, 0.85);
+            background: rgba(0, 0, 0, 0.88);
             border-top: 2px solid #4a2a2a;
             border-left: 2px solid #2a1a1a;
             padding: 20px;
             margin: 20px;
-            max-width: 700px;
+            max-width: 750px;
             align-self: center;
             width: 90%;
-            box-shadow: 0 0 20px rgba(0,0,0,0.8);
+            box-shadow: 0 0 25px rgba(0,0,0,0.9);
             font-size: 1.2rem;
             color: #ddd8c6;
         }
 
         .typewriter-text {
-            min-height: 90px;
+            min-height: 100px;
             line-height: 1.4;
-            white-space: pre-wrap;
-            word-break: break-word;
         }
 
         .choices {
@@ -159,28 +245,25 @@
             background: #110b0b;
             border: 1px solid #6a3e3e;
             color: #ebd5b3;
-            padding: 8px 16px;
+            padding: 8px 18px;
             font-family: 'Courier New', monospace;
             font-size: 0.9rem;
             cursor: pointer;
             transition: all 0.2s;
-            letter-spacing: 1px;
         }
 
         .choice-btn:hover {
             background: #2c1a1a;
             border-color: #aa6f6f;
-            color: white;
             transform: scale(1.02);
         }
 
-        /* scene title */
         .scene-title {
             text-align: center;
             margin-top: 10px;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: #884d4d;
-            letter-spacing: 4px;
+            letter-spacing: 3px;
         }
 
         button.reset-btn {
@@ -190,36 +273,38 @@
             padding: 5px 12px;
             margin-top: 10px;
             cursor: pointer;
-            font-family: monospace;
-        }
-
-        button.reset-btn:hover {
-            color: #ffaaaa;
-            border-color: #aa5555;
         }
 
         @keyframes vhs-jitter {
             0% { transform: translate(0);}
             25% { transform: translate(1px, -1px);}
             50% { transform: translate(-1px, 0);}
-            75% { transform: translate(0, 1px);}
             100% { transform: translate(0);}
         }
 
-        .glitch-active {
-            animation: vhs-jitter 0.08s infinite;
-        }
+        .glitch-active { animation: vhs-jitter 0.08s infinite; }
 
         @media (max-width: 600px) {
-            .dialogue-box { font-size: 0.9rem; padding: 14px; }
-            .stat { font-size: 0.8rem; }
-            .choice-btn { font-size: 0.75rem; }
+            .dialogue-box { font-size: 0.9rem; }
+            .stat { font-size: 0.7rem; }
+            .menu-title { font-size: 2.2rem; letter-spacing: 6px; }
         }
     </style>
 </head>
 <body>
+<div id="main-menu">
+    <div class="menu-title">SILENT ROOM</div>
+    <div class="menu-btn" id="play-btn">▶ PLAY</div>
+    <div class="menu-btn" id="credits-btn">📜 CREDITS</div>
+    <div class="lang-selector">
+        <div class="lang-btn active" data-lang="en">ENGLISH</div>
+        <div class="lang-btn" data-lang="vn">TIẾNG VIỆT</div>
+    </div>
+    <div class="credits-panel" id="mini-credits">© DARK INDIE — SILENCE SPEAKS</div>
+</div>
+
 <div id="game-container">
-    <div class="cinematic-bg" id="bgImage" style="background-image: url('https://placehold.co/1920x1080/111111/2a2a2a?text=SILENT+ROOM');"></div>
+    <div class="cinematic-bg" id="bgImage"></div>
     <div class="ui-layer">
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
             <div class="stats-panel">
@@ -230,40 +315,72 @@
             </div>
             <div class="clock" id="clockDisplay">⏰ 20:00</div>
         </div>
-
         <div class="dialogue-box">
             <div class="typewriter-text" id="dialogueText">...</div>
             <div class="choices" id="choicesContainer"></div>
-            <div style="text-align: center; margin-top: 12px;">
-                <button class="reset-btn" id="resetGameBtn">⟳ RESTART / RESET</button>
+            <div style="text-align: center; margin-top: 8px;">
+                <button class="reset-btn" id="resetGameBtn">⟳ RESTART / BACK TO MENU</button>
             </div>
         </div>
         <div class="scene-title" id="sceneName">--- hallway of echoes ---</div>
     </div>
 </div>
+
+<!-- Audio Context & Sound -->
+<audio id="bgmAudio" loop preload="auto">
+    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+</audio>
+<audio id="glitchSound" preload="auto">
+    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" type="audio/mpeg">
+</audio>
+<audio id="whisperSound" preload="auto">
+    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" type="audio/mpeg">
+</audio>
+
 <script>
-    // ----- GAME STATE -----
-    let gameState = {
-        trust: 50,
-        stress: 0,
-        corruption: 0,
-        memory: 0,
-        hour: 20,
-        minute: 0,
-        currentSceneId: "hallway_start",
-        endingsUnlocked: [],
-        gameActive: true,
-        endingFlag: null,
+    // ---------- LANGUAGE DICTIONARY ----------
+    const langData = {
+        en: {
+            menuTitle: "SILENT ROOM", play: "▶ PLAY", credits: "📜 CREDITS",
+            creditsText: "CREATIVE DIRECTION & NARRATIVE: Silent Child\nSOUND DESIGN: Ambient Drones\nART: Liminal Echoes\nSPECIAL THANKS: Those who broke their silence.",
+            endings: { good: "You Were Heard", neutral: "Nobody Noticed", bad: "The Silence Stayed", secret: "The Door Stayed Open" }
+        },
+        vn: {
+            menuTitle: "CĂN PHÒNG CÂM LẶNG", play: "▶ CHƠI", credits: "📜 CREDITS",
+            creditsText: "ĐẠO DIỄN & KỊCH BẢN: Đứa Trẻ Câm Lặng\nTHIẾT KẾ ÂM THANH: Ambient Drone\nĐỒ HỌA: Dấu Vọng\nCẢM ƠN: Những ai đã phá tan sự im lặng.",
+            endings: { good: "Bạn Đã Được Lắng Nghe", neutral: "Không Ai Để Ý", bad: "Sự Im Lặng Ở Lại", secret: "Cánh Cửa Vẫn Mở" }
+        }
     };
+    let currentLang = "en";
 
+    // Game State
+    let gameState = {
+        trust: 50, stress: 0, corruption: 0, memory: 0,
+        hour: 20, minute: 0, gameActive: true, endingFlag: null,
+        endingsUnlocked: []
+    };
     let typewriterTimeout = null;
-    let currentDialogueLine = "";
-    let currentChoices = [];
     let isTyping = false;
+    let ambientAudio = null;
+    let glitchAudio = null;
+    let isAudioEnabled = false;
 
-    // ---- HELPER FUNCTIONS ----
-    function clamp(value, min, max) { return Math.min(max, Math.max(min, value)); }
+    function initAudio() {
+        ambientAudio = document.getElementById("bgmAudio");
+        glitchAudio = document.getElementById("glitchSound");
+        if (ambientAudio) { ambientAudio.volume = 0.2; ambientAudio.loop = true; }
+        if (glitchAudio) glitchAudio.volume = 0.15;
+        isAudioEnabled = true;
+        // attempt to play on user interaction
+        document.body.addEventListener('click', () => { if(ambientAudio && ambientAudio.paused && gameState.gameActive) ambientAudio.play().catch(e=>console.log); }, { once: true });
+    }
 
+    function playAmbient() { if(ambientAudio && gameState.gameActive && isAudioEnabled) ambientAudio.play().catch(e=>console.log); }
+    function stopAmbient() { if(ambientAudio) ambientAudio.pause(); }
+
+    function triggerGlitchSound() { if(glitchAudio && isAudioEnabled) { glitchAudio.currentTime=0; glitchAudio.play().catch(e=>console.log); } }
+
+    function clamp(v,min,max){ return Math.min(max,Math.max(min,v)); }
     function updateUI() {
         document.getElementById("trustVal").innerText = Math.floor(gameState.trust);
         document.getElementById("stressVal").innerText = Math.floor(gameState.stress);
@@ -271,279 +388,192 @@
         document.getElementById("memoryVal").innerText = Math.floor(gameState.memory);
         let timeStr = `${gameState.hour.toString().padStart(2,'0')}:${gameState.minute.toString().padStart(2,'0')}`;
         document.getElementById("clockDisplay").innerHTML = `⏰ ${timeStr}`;
-        
-        // dynamic glitch effect based on stress > 60
-        const existingGlitch = document.querySelector('.glitch-overlay');
-        if (gameState.stress >= 60 && !existingGlitch) {
-            let glitchDiv = document.createElement('div');
-            glitchDiv.className = 'glitch-overlay';
-            document.body.appendChild(glitchDiv);
-            document.getElementById("game-container").classList.add('glitch-active');
-        } else if (gameState.stress < 60 && existingGlitch) {
-            existingGlitch.remove();
-            document.getElementById("game-container").classList.remove('glitch-active');
-        } else if (gameState.stress >= 60 && existingGlitch && gameState.stress > 80) {
-            // intensify
-        }
-        // background distortion based on corruption
         let bgDiv = document.getElementById("bgImage");
-        let blurAmount = Math.min(5, gameState.corruption / 25);
-        bgDiv.style.filter = `contrast(1.1) brightness(${0.6 - gameState.corruption/200}) grayscale(${gameState.corruption/120}) blur(${blurAmount}px)`;
-        if (gameState.corruption >= 70) {
-            bgDiv.style.filter += " hue-rotate(10deg)";
-        }
+        let blurAmount = Math.min(6, gameState.corruption / 20);
+        bgDiv.style.filter = `contrast(1.1) brightness(${0.6 - gameState.corruption/180}) grayscale(${gameState.corruption/110}) blur(${blurAmount}px)`;
+        if(gameState.stress>=60 && !document.querySelector('.glitch-flash-active')){ 
+            let flash = document.createElement('div'); flash.className='glitch-flash'; flash.style.animation='glitchPulse 0.12s infinite'; document.body.appendChild(flash);
+            triggerGlitchSound();
+        } else if(gameState.stress<60){ let f=document.querySelector('.glitch-flash'); if(f)f.remove(); }
     }
 
-    function advanceTime(minutesAdd = 5) {
-        if (!gameState.gameActive) return;
-        gameState.minute += minutesAdd;
-        if (gameState.minute >= 60) {
-            gameState.hour++;
-            gameState.minute = 0;
-            if (gameState.hour > 23) gameState.hour = 23;
-        }
-        // night progression: after 22:00 stepfather appears more
-        if (gameState.hour >= 22 && gameState.hour < 6) {
-            // atmospheric darkness
-            document.body.style.backgroundColor = "#000000";
-        }
+    function advanceTime(minutesAdd=5){
+        if(!gameState.gameActive) return;
+        gameState.minute+=minutesAdd;
+        if(gameState.minute>=60){ gameState.hour++; gameState.minute=0; if(gameState.hour>23) gameState.hour=23; }
+        updateUI();
+    }
+    function modifyStats(dTrust, dStress, dCorrupt, dMemory){
+        if(!gameState.gameActive) return;
+        gameState.trust = clamp(gameState.trust+dTrust,0,100);
+        gameState.stress = clamp(gameState.stress+dStress,0,100);
+        gameState.corruption = clamp(gameState.corruption+dCorrupt,0,100);
+        gameState.memory = clamp(gameState.memory+dMemory,0,100);
+        if(gameState.corruption>=85 && gameState.trust<20) triggerEnding("bad");
+        if(gameState.memory>=80 && gameState.trust>=70 && gameState.corruption<=25) triggerEnding("good");
+        if(gameState.stress>=95) triggerEnding("neutral");
+        if(gameState.memory>=70 && gameState.corruption>=40 && gameState.trust<=30 && gameState.gameActive) triggerEnding("secret");
         updateUI();
     }
 
-    function modifyStats(deltaTrust, deltaStress, deltaCorruption, deltaMemory) {
-        if (!gameState.gameActive) return;
-        gameState.trust = clamp(gameState.trust + deltaTrust, 0, 100);
-        gameState.stress = clamp(gameState.stress + deltaStress, 0, 100);
-        gameState.corruption = clamp(gameState.corruption + deltaCorruption, 0, 100);
-        gameState.memory = clamp(gameState.memory + deltaMemory, 0, 100);
-        if (gameState.corruption >= 85 && gameState.trust < 20) {
-            triggerEnding("bad");
-        }
-        if (gameState.memory >= 80 && gameState.trust >= 70 && gameState.corruption <= 25) {
-            triggerEnding("good");
-        }
-        if (gameState.stress >= 95) triggerEnding("neutral");
-        if (gameState.memory >= 70 && gameState.corruption >= 40 && gameState.trust <= 30) triggerEnding("secret");
-        updateUI();
+    function setBackground(sceneKey){
+        const bgMap = { hallway:"https://placehold.co/1920x1080/1a1210/2c1e1a?text=ABANDONED+HALLWAY", childroom:"https://placehold.co/1920x1080/0f0c18/1f1a2e?text=CRUMBLING+ROOM", classroom:"https://placehold.co/1920x1080/1c1b1a/3e2f2a?text=EMPTY+SCHOOL", night_corridor:"https://placehold.co/1920x1080/050505/2f1414?text=NARROW+HALL", memory_garden:"https://placehold.co/1920x1080/15222b/1d3e3a?text=FADED+GARDEN", door_room:"https://placehold.co/1920x1080/0a080f/2b1b2c?text=THE+DOOR" };
+        document.getElementById("bgImage").style.backgroundImage = `url('${bgMap[sceneKey]||bgMap.hallway}')`;
     }
 
-    function setBackground(sceneKey) {
-        const backgrounds = {
-            hallway: "https://placehold.co/1920x1080/1a1210/2c1e1a?text=ABANDONED+HALLWAY",
-            childroom: "https://placehold.co/1920x1080/0f0c18/1f1a2e?text=CRUMBLING+ROOM",
-            classroom: "https://placehold.co/1920x1080/1c1b1a/3e2f2a?text=EMPTY+SCHOOL",
-            night_corridor: "https://placehold.co/1920x1080/050505/2f1414?text=NARROW+HALL",
-            memory_garden: "https://placehold.co/1920x1080/15222b/1d3e3a?text=FADED+GARDEN",
-            door_room: "https://placehold.co/1920x1080/0a080f/2b1b2c?text=THE+DOOR",
-        };
-        let url = backgrounds[sceneKey] || backgrounds.hallway;
-        document.getElementById("bgImage").style.backgroundImage = `url('${url}')`;
+    async function typewriterEffect(text, element, speed=32){
+        if(typewriterTimeout) clearTimeout(typewriterTimeout);
+        isTyping=true;
+        element.innerHTML="";
+        for(let i=0;i<text.length;i++){ if(!gameState.gameActive) break; element.innerHTML+=text[i]; await new Promise(r=>setTimeout(r,speed)); }
+        isTyping=false;
     }
 
-    async function typewriterEffect(text, element, speed=35) {
-        if (typewriterTimeout) clearTimeout(typewriterTimeout);
-        isTyping = true;
-        element.innerHTML = "";
-        for (let i=0; i<text.length; i++) {
-            if (!gameState.gameActive) break;
-            element.innerHTML += text[i];
-            await new Promise(resolve => setTimeout(resolve, speed));
-        }
-        isTyping = false;
-    }
-
-    function showScene(scene) {
-        if (!gameState.gameActive) return;
-        setBackground(scene.bg || "hallway");
+    async function showScene(scene){
+        if(!gameState.gameActive) return;
+        setBackground(scene.bg);
         document.getElementById("sceneName").innerText = scene.sceneTitle || "--- silent room ---";
-        currentDialogueLine = scene.dialogue;
-        currentChoices = scene.choices;
-        renderDialogueAndChoices();
-    }
-
-    async function renderDialogueAndChoices() {
-        const dialogueDiv = document.getElementById("dialogueText");
-        if (typewriterTimeout) clearTimeout(typewriterTimeout);
-        if (isTyping) return;
-        await typewriterEffect(currentDialogueLine, dialogueDiv, 28);
-        const container = document.getElementById("choicesContainer");
+        await typewriterEffect(scene.dialogue, document.getElementById("dialogueText"), 28);
+        let container = document.getElementById("choicesContainer");
         container.innerHTML = "";
-        currentChoices.forEach(choice => {
+        scene.choices.forEach(choice => {
             let btn = document.createElement("button");
             btn.innerText = choice.text;
             btn.className = "choice-btn";
-            btn.onclick = () => {
-                if (!gameState.gameActive) return;
-                choice.action();
-            };
+            btn.onclick = () => { if(gameState.gameActive) choice.action(); };
             container.appendChild(btn);
         });
     }
 
-    // ----- ENDINGS with localStorage -----
-    function triggerEnding(type) {
-        if (!gameState.gameActive) return;
-        gameState.gameActive = false;
-        let endingDesc = "";
-        if (type === "good") { endingDesc = "You Were Heard"; gameState.endingFlag = "good"; }
-        else if (type === "neutral") { endingDesc = "Nobody Noticed"; gameState.endingFlag = "neutral"; }
-        else if (type === "bad") { endingDesc = "The Silence Stayed"; gameState.endingFlag = "bad"; }
-        else if (type === "secret") { endingDesc = "The Door Stayed Open"; gameState.endingFlag = "secret"; }
-        if (!gameState.endingsUnlocked.includes(endingDesc)) gameState.endingsUnlocked.push(endingDesc);
+    function triggerEnding(type){
+        if(!gameState.gameActive) return;
+        gameState.gameActive=false;
+        stopAmbient();
+        let endingKey = { good:"good", neutral:"neutral", bad:"bad", secret:"secret" }[type];
+        let endingDisplay = langData[currentLang].endings[endingKey];
+        if(!gameState.endingsUnlocked.includes(endingDisplay)) gameState.endingsUnlocked.push(endingDisplay);
         localStorage.setItem("silentRoomEndings", JSON.stringify(gameState.endingsUnlocked));
-        const dialogueDiv = document.getElementById("dialogueText");
-        dialogueDiv.innerHTML = `[GAME OVER] --- ${endingDesc} ---\n\nYour echoes remain in the silent room.\n\nPress RESTART to begin a new cycle.`;
+        document.getElementById("dialogueText").innerHTML = `[GAME OVER] --- ${endingDisplay} ---\n\nYour echoes remain in the silent room.\n\nPress RESTART.`;
         document.getElementById("choicesContainer").innerHTML = "";
         updateUI();
     }
 
-    function loadUnlockedEndings() {
-        let saved = localStorage.getItem("silentRoomEndings");
-        if (saved) gameState.endingsUnlocked = JSON.parse(saved);
-    }
-
-    // ----- SCENES & NARRATIVE FLOW (symbolic horror)-----
-    function sceneTransition(sceneId) {
+    // --- SCENES (symbolic) ---
+    function sceneTransition(sceneId){
         const scenes = {
-            hallway_start: {
-                bg: "hallway", sceneTitle: "the hallway - no footsteps",
-                dialogue: "You stand in a narrow corridor. The wallpaper peels like old skin. A grandfather clock ticks unevenly. Somewhere, a door creaks.\n\nYour shadow seems too tall tonight.",
-                choices: [
-                    { text: "🔍 Look at the mirror at the end", action: () => { modifyStats(0, 5, 2, 2); advanceTime(10); sceneTransition("mirror_scene"); } },
-                    { text: "🚪 Enter the living room", action: () => { modifyStats(-2, 7, 3, 0); advanceTime(15); sceneTransition("livingroom_stepfather"); } },
-                    { text: "📓 Go to your room & draw", action: () => { modifyStats(5, -3, -1, 10); advanceTime(20); sceneTransition("childroom_memory"); } }
-                ]
-            },
-            mirror_scene: {
-                bg: "night_corridor", sceneTitle: "cracked reflection",
-                dialogue: "The mirror shows a child with hollow eyes. Behind you, a tall figure stands briefly, then fades. A whisper: 'Be silent.'",
-                choices: [
-                    { text: "Whisper back 'I am here'", action: () => { modifyStats(10, 12, 5, 5); advanceTime(5); sceneTransition("hallway_start"); } },
-                    { text: "Turn around quickly", action: () => { modifyStats(-5, 18, 8, 2); advanceTime(5); sceneTransition("livingroom_stepfather"); } }
-                ]
-            },
-            livingroom_stepfather: {
-                bg: "night_corridor", sceneTitle: "the heavy armchair",
-                dialogue: "The room is cold. A tall figure sits, face in shadow. He doesn't look at you. 'The silence suits you tonight. You know what happens when words break the quiet.'",
-                choices: [
-                    { text: "Nod and slip away", action: () => { modifyStats(-8, 15, 12, 0); advanceTime(20); sceneTransition("hallway_start"); } },
-                    { text: "Say 'I have a voice'", action: () => { modifyStats(-15, 20, 18, 10); advanceTime(25); sceneTransition("nightmare_hall"); } },
-                    { text: "Ask about mother", action: () => { modifyStats(2, 25, 15, 5); advanceTime(10); sceneTransition("broken_teacher"); } }
-                ]
-            },
-            nightmare_hall: {
-                bg: "night_corridor", sceneTitle: "twisting corridor",
-                dialogue: "The walls bleed shadows. The Stepfather's voice echoes: 'You broke the pact.' Your heartbeat is a drum. The clock strikes 2 AM.",
-                choices: [
-                    { text: "Run toward the faint light", action: () => { modifyStats(5, 30, 5, 15); advanceTime(10); sceneTransition("classroom_friend"); } },
-                    { text: "Hide inside the closet", action: () => { modifyStats(-15, 40, 20, -5); advanceTime(20); sceneTransition("closet_silence"); } }
-                ]
-            },
-            classroom_friend: {
-                bg: "classroom", sceneTitle: "desks and whispers",
-                dialogue: "Your friend Leo sits by the window. 'You look tired. Is it... him again? I believe you, you know.' He offers a drawing of a door.",
-                choices: [
-                    { text: "Accept drawing + confide", action: () => { modifyStats(15, -10, -5, 20); advanceTime(15); sceneTransition("memory_garden_scene"); } },
-                    { text: "Say nothing and leave", action: () => { modifyStats(-5, 5, 10, 0); advanceTime(10); sceneTransition("hallway_start"); } }
-                ]
-            },
-            memory_garden_scene: {
-                bg: "memory_garden", sceneTitle: "overgrown promises",
-                dialogue: "You recall a garden before the silence. A younger you laughs. Then gray fog swallows everything. A door appears, slightly ajar.",
-                choices: [
-                    { text: "Open the door gently", action: () => { modifyStats(20, -15, -15, 35); advanceTime(0); sceneTransition("final_door"); } },
-                    { text: "Walk away, afraid", action: () => { modifyStats(-5, 12, 8, -5); advanceTime(20); sceneTransition("livingroom_stepfather"); } }
-                ]
-            },
-            childroom_memory: {
-                bg: "childroom", sceneTitle: "old stuffed rabbit",
-                dialogue: "In your room, a music box plays a broken tune. Under the bed you find a drawing from when you were happy. The word 'HELP' faintly.",
-                choices: [
-                    { text: "Keep the drawing as proof", action: () => { modifyStats(5, -5, -2, 20); advanceTime(10); sceneTransition("hallway_start"); } },
-                    { text: "Tear it up (numbness)", action: () => { modifyStats(-10, 15, 12, -15); advanceTime(15); sceneTransition("livingroom_stepfather"); } }
-                ]
-            },
-            broken_teacher: {
-                bg: "classroom", sceneTitle: "detention of echoes",
-                dialogue: "Your teacher, Ms. Vellum, looks concerned. 'Your grades are slipping. Is everything alright at home?' She glances at the door uneasily.",
-                choices: [
-                    { text: "'I'm fine' (silence)", action: () => { modifyStats(-8, 10, 10, -5); advanceTime(20); sceneTransition("hallway_start"); } },
-                    { text: "'I need help'", action: () => { modifyStats(15, -5, -10, 20); advanceTime(15); sceneTransition("memory_garden_scene"); } }
-                ]
-            },
-            closet_silence: {
-                bg: "night_corridor", sceneTitle: "breath in the dark",
-                dialogue: "Inside the closet, you hear heavy footsteps. 'You are good when quiet.' Hours pass. A small crack of light.",
-                choices: [
-                    { text: "Crawl toward the light", action: () => { modifyStats(-20, 40, 15, 5); advanceTime(25); sceneTransition("hallway_start"); } }
-                ]
-            },
-            final_door: {
-                bg: "door_room", sceneTitle: "threshold",
-                dialogue: "A white wooden door. Behind it, a warm breeze. You hear your own laughter. The Stepfather's voice fades: 'You were never supposed to speak...' Do you cross?",
-                choices: [
-                    { text: "CROSS THE DOOR (healing)", action: () => { modifyStats(40, -50, -40, 60); if (gameState.memory >= 70 && gameState.corruption <= 40) triggerEnding("good"); else triggerEnding("neutral"); } },
-                    { text: "Stay in the silent room", action: () => { modifyStats(-30, 30, 25, -15); triggerEnding("bad"); } }
-                ]
-            }
+            hallway_start: { bg:"hallway", sceneTitle:"the hallway - no footsteps", dialogue:"You stand in a narrow corridor. Wallpaper peels like old skin. The clock ticks unevenly. Your shadow seems too tall tonight.", choices:[
+                { text:"🔍 Look at the mirror", action:()=>{ modifyStats(0,5,2,2); advanceTime(10); sceneTransition("mirror_scene"); } },
+                { text:"🚪 Enter living room", action:()=>{ modifyStats(-2,7,3,0); advanceTime(15); sceneTransition("livingroom_stepfather"); } },
+                { text:"📓 Go to your room", action:()=>{ modifyStats(5,-3,-1,10); advanceTime(20); sceneTransition("childroom_memory"); } }
+            ]},
+            mirror_scene:{ bg:"night_corridor", sceneTitle:"cracked reflection", dialogue:"The mirror shows hollow eyes. Behind you, a tall figure fades. A whisper: 'Be silent.'", choices:[
+                { text:"Whisper 'I am here'", action:()=>{ modifyStats(10,12,5,5); advanceTime(5); sceneTransition("hallway_start"); } },
+                { text:"Turn around quickly", action:()=>{ modifyStats(-5,18,8,2); advanceTime(5); sceneTransition("livingroom_stepfather"); } }
+            ]},
+            livingroom_stepfather:{ bg:"night_corridor", sceneTitle:"the heavy armchair", dialogue:"The room is cold. A tall figure sits in shadow. 'The silence suits you tonight. You know what happens when words break the quiet.'", choices:[
+                { text:"Nod and slip away", action:()=>{ modifyStats(-8,15,12,0); advanceTime(20); sceneTransition("hallway_start"); } },
+                { text:"Say 'I have a voice'", action:()=>{ modifyStats(-15,20,18,10); advanceTime(25); sceneTransition("nightmare_hall"); } },
+                { text:"Ask about mother", action:()=>{ modifyStats(2,25,15,5); advanceTime(10); sceneTransition("broken_teacher"); } }
+            ]},
+            nightmare_hall:{ bg:"night_corridor", sceneTitle:"twisting corridor", dialogue:"Walls bleed shadows. 'You broke the pact.' Clock strikes 2 AM.", choices:[
+                { text:"Run toward faint light", action:()=>{ modifyStats(5,30,5,15); advanceTime(10); sceneTransition("classroom_friend"); } },
+                { text:"Hide inside closet", action:()=>{ modifyStats(-15,40,20,-5); advanceTime(20); sceneTransition("closet_silence"); } }
+            ]},
+            classroom_friend:{ bg:"classroom", sceneTitle:"desks and whispers", dialogue:"Your friend Leo: 'You look tired. Is it... him again? I believe you.' He offers a drawing of a door.", choices:[
+                { text:"Accept and confide", action:()=>{ modifyStats(15,-10,-5,20); advanceTime(15); sceneTransition("memory_garden_scene"); } },
+                { text:"Say nothing", action:()=>{ modifyStats(-5,5,10,0); advanceTime(10); sceneTransition("hallway_start"); } }
+            ]},
+            memory_garden_scene:{ bg:"memory_garden", sceneTitle:"overgrown promises", dialogue:"You recall a garden before silence. A younger you laughs. Fog swallows everything. A door appears, slightly ajar.", choices:[
+                { text:"Open the door gently", action:()=>{ modifyStats(20,-15,-15,35); advanceTime(0); sceneTransition("final_door"); } },
+                { text:"Walk away afraid", action:()=>{ modifyStats(-5,12,8,-5); advanceTime(20); sceneTransition("livingroom_stepfather"); } }
+            ]},
+            childroom_memory:{ bg:"childroom", sceneTitle:"old stuffed rabbit", dialogue:"Music box broken tune. Under the bed a drawing from happy times. Word 'HELP' faint.", choices:[
+                { text:"Keep the drawing", action:()=>{ modifyStats(5,-5,-2,20); advanceTime(10); sceneTransition("hallway_start"); } },
+                { text:"Tear it up (numbness)", action:()=>{ modifyStats(-10,15,12,-15); advanceTime(15); sceneTransition("livingroom_stepfather"); } }
+            ]},
+            broken_teacher:{ bg:"classroom", sceneTitle:"detention of echoes", dialogue:"Teacher Ms. Vellum: 'Your grades are slipping. Everything alright at home?' She glances nervously.", choices:[
+                { text:"'I'm fine' (silence)", action:()=>{ modifyStats(-8,10,10,-5); advanceTime(20); sceneTransition("hallway_start"); } },
+                { text:"'I need help'", action:()=>{ modifyStats(15,-5,-10,20); advanceTime(15); sceneTransition("memory_garden_scene"); } }
+            ]},
+            closet_silence:{ bg:"night_corridor", sceneTitle:"breath in the dark", dialogue:"Inside closet, heavy footsteps. 'You are good when quiet.' Hours pass. A crack of light.", choices:[
+                { text:"Crawl toward light", action:()=>{ modifyStats(-20,40,15,5); advanceTime(25); sceneTransition("hallway_start"); } }
+            ]},
+            final_door:{ bg:"door_room", sceneTitle:"threshold", dialogue:"White wooden door. Warm breeze, your own laughter. The Stepfather's voice fades: 'You were never supposed to speak...' Do you cross?", choices:[
+                { text:"CROSS THE DOOR (healing)", action:()=>{ modifyStats(40,-50,-40,60); if(gameState.memory>=70 && gameState.corruption<=40) triggerEnding("good"); else triggerEnding("neutral"); } },
+                { text:"Stay in silent room", action:()=>{ modifyStats(-30,30,25,-15); triggerEnding("bad"); } }
+            ]}
         };
-        if (scenes[sceneId]) showScene(scenes[sceneId]);
+        if(scenes[sceneId]) showScene(scenes[sceneId]);
         else showScene(scenes.hallway_start);
     }
 
-    // ---- SECRET ENDING conditions via memory tree ----
-    // we already check secret ending in modifyStats; secret path memory + corruption
-    // additional secret scene maybe by high corruption & memory?
-    function secretCheckOverride() {
-        if (gameState.memory >= 70 && gameState.corruption >= 40 && gameState.trust <= 30 && gameState.gameActive) {
-            triggerEnding("secret");
-        }
+    function resetGameToMenu(){
+        if(typewriterTimeout) clearTimeout(typewriterTimeout);
+        stopAmbient();
+        gameState = { trust:50, stress:0, corruption:0, memory:0, hour:20, minute:0, gameActive:true, endingFlag:null, endingsUnlocked: gameState?.endingsUnlocked || [] };
+        updateUI();
+        document.getElementById("game-container").style.display = "none";
+        document.getElementById("main-menu").style.display = "flex";
+        let flashes = document.querySelectorAll('.glitch-flash'); flashes.forEach(f=>f.remove());
     }
 
-    // initial reset game
-    function resetGame() {
-        if (typewriterTimeout) clearTimeout(typewriterTimeout);
-        gameState = {
-            trust: 50,
-            stress: 0,
-            corruption: 0,
-            memory: 0,
-            hour: 20,
-            minute: 0,
-            currentSceneId: "hallway_start",
-            endingsUnlocked: gameState.endingsUnlocked || [],
-            gameActive: true,
-            endingFlag: null,
-        };
+    function startGame(){
+        document.getElementById("main-menu").style.display = "none";
+        document.getElementById("game-container").style.display = "flex";
+        gameState = { trust:50, stress:0, corruption:0, memory:0, hour:20, minute:0, gameActive:true, endingFlag:null, endingsUnlocked: gameState?.endingsUnlocked || [] };
         updateUI();
         sceneTransition("hallway_start");
-        let glitchElem = document.querySelector('.glitch-overlay');
-        if (glitchElem) glitchElem.remove();
-        document.getElementById("game-container").classList.remove('glitch-active');
-        document.getElementById("bgImage").style.filter = "";
+        playAmbient();
+        let interval = setInterval(()=>{
+            if(gameState.gameActive){
+                if(gameState.hour>=22||gameState.hour<=5){ modifyStats(0, gameState.corruption>30?2:1,0,0); }
+                if(gameState.stress>70) modifyStats(-1,1,1,0);
+                if(gameState.trust<=20 && gameState.hour>=23) modifyStats(0,2,2,0);
+                if(gameState.memory>=70 && gameState.corruption>=40 && gameState.trust<=30 && gameState.gameActive) triggerEnding("secret");
+            }
+        }, 15000);
+        window._gameInterval = interval;
     }
 
-    // Timer automatic progression: increases stress at night if corruption high
-    setInterval(() => {
-        if (gameState.gameActive) {
-            if (gameState.hour >= 22 || gameState.hour <= 5) {
-                let nightStress = gameState.corruption > 30 ? 2 : 1;
-                modifyStats(0, nightStress, 0, 0);
-            }
-            if (gameState.stress > 70) {
-                modifyStats(-1, 1, 1, 0);
-            }
-            if (gameState.trust <= 20 && gameState.hour >= 23) {
-                modifyStats(0, 2, 2, 0);
-            }
-            secretCheckOverride();
-        }
-    }, 18000); // every 18 seconds chilling time, but comfortable
+    // Load saved endings
+    function loadEndings(){
+        let saved = localStorage.getItem("silentRoomEndings");
+        if(saved) gameState.endingsUnlocked = JSON.parse(saved);
+    }
 
-    // start game
-    loadUnlockedEndings();
-    resetGame();
-    document.getElementById("resetGameBtn").onclick = () => { resetGame(); };
+    // Language handling
+    function setLanguage(lang){
+        currentLang = lang;
+        document.querySelectorAll(".lang-btn").forEach(btn=>btn.classList.remove("active"));
+        document.querySelector(`.lang-btn[data-lang="${lang}"]`).classList.add("active");
+        document.querySelector(".menu-title").innerText = langData[lang].menuTitle;
+        document.getElementById("play-btn").innerText = langData[lang].play;
+        document.getElementById("credits-btn").innerText = langData[lang].credits;
+    }
+
+    // Credits modal simulation
+    function showCredits() {
+        alert(langData[currentLang].creditsText);
+    }
+
+    // Event bindings
+    document.getElementById("play-btn").onclick = () => { startGame(); };
+    document.getElementById("credits-btn").onclick = showCredits;
+    document.getElementById("resetGameBtn").onclick = () => { resetGameToMenu(); if(window._gameInterval) clearInterval(window._gameInterval); };
+    document.querySelectorAll(".lang-btn").forEach(btn=>{
+        btn.onclick = (e) => { setLanguage(btn.getAttribute("data-lang")); };
+    });
+    document.getElementById("mini-credits").onclick = showCredits;
+
+    initAudio();
+    loadEndings();
+    setLanguage("en");
+    // Show menu, ensure game hidden
+    document.getElementById("game-container").style.display = "none";
+    document.getElementById("main-menu").style.display = "flex";
+    // Additional overlay elements
+    let crtDiv = document.createElement('div'); crtDiv.className='crt-overlay'; document.body.appendChild(crtDiv);
+    let vignetteDiv = document.createElement('div'); vignetteDiv.className='vignette'; document.body.appendChild(vignetteDiv);
 </script>
 </body>
 </html>
