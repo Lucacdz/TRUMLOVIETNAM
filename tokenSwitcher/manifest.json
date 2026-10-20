@@ -1,0 +1,14 @@
+{
+  "name": "Token Switcher",
+  "description": "Lay token phien hien tai va dang nhap bang token (tai khoan cua ban).",
+  "authors": [
+    {
+      "name": "Lucac",
+      "id": "0"
+    }
+  ],
+  "main": "index.js",
+  "vendetta": {
+    "icon": "ic_key"
+  }
+}
